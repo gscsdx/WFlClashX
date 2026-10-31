@@ -163,9 +163,16 @@ class GlobalState {
       ? appVersionTag
       : (isPre ? "${packageInfo.version}-pre" : packageInfo.version);
 
-  String get ua =>
-      config.patchClashConfig.globalUa ??
+  /// FlClash X's own identity, always derived from the running versions.
+  /// Kept separate from [ua] because the stored `global-ua` normally replaces
+  /// it — the default identity is clash-verge, not the app itself.
+  String get appUa =>
       packageInfo.ua(appVersion: _uaVersion, coreVersion: coreVersion);
+
+  /// The header value actually sent: the user's choice, the clash-verge
+  /// fallback when nothing is stored, or the live app identity when the user
+  /// explicitly picked "FlClash X".
+  String get ua => resolveUa(config.patchClashConfig.globalUa, appUa);
 
   int _tasksEpoch = 0;
 
@@ -694,7 +701,11 @@ class GlobalState {
     }
     
     rawConfig["geox-url"] = mergedGeoXUrl;
-    rawConfig["global-ua"] = realPatchConfig.globalUa;
+    // `global-ua` also governs the core's own fetches (proxy/rule providers,
+    // geo files), so it must carry the same identity the app sends — leaving it
+    // null would let mihomo fall back to its built-in one and split the
+    // identity across the two halves of the same client.
+    rawConfig["global-ua"] = resolveUa(realPatchConfig.globalUa, appUa);
     if (rawConfig["hosts"] == null) {
       rawConfig["hosts"] = {};
     }

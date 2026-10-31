@@ -292,6 +292,26 @@ class Config with _$Config {
           }
         }
       }
+
+      // Migration: the old UA preset shipped a misspelled "clashx-verge/…",
+      // which no provider recognises as clash-verge — clients key on the exact
+      // "clash-verge/" prefix. Rewrite the stored value so an existing choice
+      // keeps working instead of silently falling back to a generic profile.
+      final patchClashConfig = json["patchClashConfig"];
+      if (patchClashConfig is Map) {
+        final globalUa = patchClashConfig["global-ua"];
+        if (globalUa is String && globalUa.startsWith("clashx-verge/")) {
+          patchClashConfig["global-ua"] =
+              globalUa.replaceFirst("clashx-verge/", "clash-verge/");
+        } else if (globalUa is String &&
+            globalUa.startsWith("ClashforWindows/")) {
+          // Migration: the Clash for Windows preset was dropped from the
+          // picker. Clear the stored value so this row falls back to the
+          // current default instead of keeping the removed identity around as
+          // an unlabelled custom entry the user can't get rid of.
+          patchClashConfig["global-ua"] = null;
+        }
+      }
     } catch (_) {}
     return Config.fromJson(json);
   }

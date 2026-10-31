@@ -82,3 +82,6 @@ docs/
 
 # Landing page (deployed separately)
 docs/
+
+# Local agent workspace (memory / session logs), not part of the project
+.workbuddy/

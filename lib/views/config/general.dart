@@ -123,26 +123,34 @@ class UaItem extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final globalUa =
         ref.watch(patchClashConfigProvider.select((state) => state.globalUa));
-    return ListItem<String?>.options(
+    // Resolve the stored value against the presets; a value this build doesn't
+    // ship (renamed preset, hand-edited config) stays selectable instead of
+    // being reset on the next tap.
+    final options = uaOptionsOf(globalUa, globalState.appUa);
+    return ListItem<UaPreset>.options(
       leading: const Icon(Icons.computer_outlined),
       title: const Text("UA"),
-      subtitle: Text(globalUa ?? appLocalizations.defaultText),
-      delegate: OptionsDelegate<String?>(
+      // Show the string that actually leaves the device: the presets are
+      // version-stamped, and a label alone doesn't tell the user what the
+      // provider will see.
+      subtitle: Text(globalState.ua),
+      delegate: OptionsDelegate<UaPreset>(
         title: "UA",
-        options: [
-          null,
-          "clashx-verge/v1.6.6",
-          "ClashforWindows/0.19.23",
-        ],
-        value: globalUa,
-        onChanged: (value) {
+        options: options,
+        value: uaPresetOf(globalUa, options),
+        onChanged: (preset) {
+          if (preset == null) {
+            return;
+          }
           ref.read(patchClashConfigProvider.notifier).updateState(
                 (state) => state.copyWith(
-                  globalUa: value,
+                  globalUa: preset.value,
                 ),
               );
         },
-        textBuilder: (ua) => ua ?? appLocalizations.defaultText,
+        textBuilder: (preset) => preset.isDefault
+            ? "${preset.label} (${appLocalizations.defaultText})"
+            : preset.label,
       ),
     );
   }
