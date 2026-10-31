@@ -1,0 +1,72 @@
+name: ci
+
+# Compile check for everyday changes: Android only, no signing secrets, no
+# release. build.yaml stays responsible for tagged multi-platform releases —
+# it needs the keystore and Apple certs, which a fresh checkout doesn't have.
+# Signing here falls back to the debug keystore (see android/app/build.gradle.kts),
+# so the produced APK installs fine for testing but isn't publishable.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "lib/**"
+      - "core/**"
+      - "setup.dart"
+      - "pubspec.yaml"
+      - "pubspec.lock"
+      - ".github/workflows/ci.yml"
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.26.0"
+          cache-dependency-path: core/go.sum
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.41.7"
+          cache: true
+
+      # setup.dart reads ANDROID_NDK to pick the clang cross-compilers for the
+      # core. The runner image doesn't always export that exact name, so derive
+      # it from the installed NDK when missing.
+      - name: Resolve Android NDK
+        run: |
+          if [ -z "${ANDROID_NDK:-}" ]; then
+            NDK_DIR=$(ls -d "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/ndk"/* 2>/dev/null | sort -V | tail -n1)
+            if [ -n "$NDK_DIR" ]; then
+              echo "ANDROID_NDK=$NDK_DIR" >> "$GITHUB_ENV"
+            fi
+          fi
+          echo "ANDROID_NDK=${ANDROID_NDK:-$NDK_DIR}"
+
+      - name: Get Flutter dependencies
+        run: flutter pub get
+
+      - name: Build Android
+        run: dart setup.dart android
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v6
+        with:
+          name: android-apk
+          path: ./dist
+          overwrite: true
