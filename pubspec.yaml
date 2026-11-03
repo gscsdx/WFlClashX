@@ -98,6 +98,9 @@ dev_dependencies:
 # and uses the new name. Override until the lint stack (custom_lint/riverpod_lint)
 # is bumped to versions that depend on a 7.6.0-compatible analyzer_plugin.
 dependency_overrides:
+  # dynamic_color 1.9.x's android build.gradle.kts fails under Kotlin 2.2
+  # (receiver type mismatch on kotlin {}); 1.8.1 uses the Groovy build file.
+  dynamic_color: 1.8.1
   analyzer_plugin: 0.13.4
   # device_info_plus_ohos 0.0.8 pins flutter_lints ^2 as a regular dep; lints
   # are dev-only, so force the project's version to unblock resolution.
