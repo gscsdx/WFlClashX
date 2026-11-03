@@ -1,0 +1,9 @@
+# OHOS build artifacts
+build/
+.cxx/
+**/oh_modules/
+**/.hvigor/
+**/.idea/
+**/oh-package-lock.json5
+libs/arm64-v8a/libclash_core.so
+local.properties

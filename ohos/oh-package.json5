@@ -1,0 +1,19 @@
+{
+  "modelVersion": "5.0.0",
+  "description": "Wormhole for HarmonyOS (Flutter-OHOS hybrid)",
+  "dependencies": {},
+  "devDependencies": {
+    "@ohos/hypium": "1.0.19"
+  },
+  "overrides": {
+    "device_info_plus_ohos": "file:./har/device_info_plus_ohos.har",
+    "network_info_plus_ohos": "file:./har/network_info_plus_ohos.har",
+    "package_info_plus_ohos": "file:./har/package_info_plus_ohos.har",
+    "path_provider_ohos": "file:./har/path_provider_ohos.har",
+    "shared_preferences_ohos": "file:./har/shared_preferences_ohos.har",
+    "url_launcher_ohos": "file:./har/url_launcher_ohos.har",
+    "webview_flutter_ohos": "file:./har/webview_flutter_ohos.har",
+    "@ohos/flutter_ohos": "file:./har/flutter.har",
+    "@ohos/flutter_module": "file:./entry"
+  }
+}

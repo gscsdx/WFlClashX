@@ -1,0 +1,7 @@
+{
+  "string": [
+    { "name": "app_name", "value": "Wormhole" },
+    { "name": "module_desc", "value": "Wormhole main module" },
+    { "name": "vpn_desc", "value": "Wormhole VPN tunnel service" }
+  ]
+}
