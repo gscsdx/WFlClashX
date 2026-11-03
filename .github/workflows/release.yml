@@ -123,8 +123,11 @@ jobs:
         shell: bash
         run: |
           if [ -f build.log ]; then
-            tail -n 10 build.log | while IFS= read -r line; do
-              [ -n "$line" ] && echo "::error::${line:0:500}"
+            grep -inE "error( |:)|failed|failure|exception|cannot|unable|not found|undefined" build.log | tail -n 10 | while IFS= read -r line; do
+              echo "::error::${line:0:450}"
+            done
+            tail -n 4 build.log | while IFS= read -r line; do
+              echo "::error::TAIL ${line:0:450}"
             done
           fi
 
