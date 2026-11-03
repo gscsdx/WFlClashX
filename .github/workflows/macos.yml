@@ -1,0 +1,111 @@
+name: macos
+
+# macOS-only cloud build (amd64 + arm64).
+#
+# Split out from build.yml on purpose: GitHub's macOS runners are heavily
+# contended, and jobs that wait too long in the queue get cancelled — which
+# turned every main push into a red run even though the other five platforms
+# were fine. Running macOS as its own two-job workflow gets scheduled much
+# faster, and it can be dispatched by hand at any time:
+#
+#   Actions -> macos -> Run workflow
+#
+# Secrets-free: no Apple certificate here, so the build is unsigned
+# (CODE_SIGNING_ALLOWED = NO). The resulting dmg runs after right-click open
+# or `xattr -cr /Applications/Wormhole.app`.
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    # Only re-run when this workflow file changes, so the commit that installs
+    # it kicks off one macOS build and later pushes don't queue macOS jobs.
+    paths:
+      - ".github/workflows/macos.yml"
+
+env:
+  IS_STABLE: ${{ !contains(github.ref, '-') }}
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    runs-on: macos-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [amd64, arm64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.26.0"
+          cache-dependency-path: core/go.sum
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.41.7"
+          cache: true
+
+      - run: flutter --version
+
+      - name: Get Flutter Dependency
+        run: flutter pub get
+
+      # setup.dart runs `npm install -g create-dmg` silently (without checking
+      # the result) and then needs the binary to package the dmg. The default
+      # system prefix is not writable on CI, so point npm at $HOME.
+      - name: Configure npm prefix
+        run: |
+          mkdir -p "$HOME/.npm-global"
+          npm config set prefix "$HOME/.npm-global"
+          echo "$HOME/.npm-global/bin" >> "$GITHUB_PATH"
+
+      - name: Install create-dmg
+        run: npm install -g create-dmg
+
+      - name: Disable code signing (no Apple certificate in this repo)
+        run: |
+          cat > macos/Runner/Configs/Local.xcconfig << EOF
+          CODE_SIGN_IDENTITY =
+          CODE_SIGNING_ALLOWED = NO
+          CODE_SIGNING_REQUIRED = NO
+          EOF
+          xattr -cr macos 2>/dev/null || true
+          echo "macOS code signing disabled (unsigned dmg)"
+
+      - name: Build
+        shell: bash
+        run: |
+          dart setup.dart macos --arch ${{ matrix.arch }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }} 2>&1 | tee build.log
+          exit ${PIPESTATUS[0]}
+
+      - name: Probe log tail
+        if: failure()
+        shell: bash
+        run: |
+          set +e +o pipefail
+          if [ ! -f build.log ]; then echo "::error::no build.log"; exit 0; fi
+          tail -n 12 build.log | while IFS= read -r line; do echo "::error::TAIL ${line:0:440}"; done
+
+      - name: Probe matched error lines
+        if: failure()
+        shell: bash
+        run: |
+          set +e +o pipefail
+          [ -f build.log ] || exit 0
+          grep -inE "error:|fatal error|cannot find|No such file|npm ERR|ERR!|EACCES|EPERM|Unable to|BUILD FAILED|CodeSign|create-dmg" build.log \
+            | tail -n 12 | while IFS= read -r line; do echo "::error::${line:0:440}"; done
+
+      - name: Upload
+        uses: actions/upload-artifact@v6
+        with:
+          name: artifact-macos-${{ matrix.arch }}
+          path: ./dist
+          overwrite: true

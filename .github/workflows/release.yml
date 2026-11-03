@@ -179,6 +179,9 @@ jobs:
 
   release:
     needs: [build]
+    # Publish whatever was built: a single platform failing (or a macOS job
+    # being queue-cancelled) must not swallow the whole release.
+    if: always() && !cancelled()
     runs-on: ubuntu-latest
     permissions:
       contents: write
