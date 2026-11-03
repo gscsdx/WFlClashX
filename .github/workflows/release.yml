@@ -94,6 +94,14 @@ jobs:
           echo "ANDROID_NDK=$NDK_DIR" >> "$GITHUB_ENV"
           echo "Resolved ANDROID_NDK=$NDK_DIR"
 
+      # gradle pins ndkVersion 28.0.13004108; auto-installing it fails unless the
+      # matching SDK license is accepted, so accept everything and preinstall.
+      - name: Accept SDK licenses & install pinned NDK
+        if: matrix.platform == 'android'
+        run: |
+          yes | sdkmanager --licenses > /dev/null || true
+          sdkmanager --install "ndk;28.0.13004108" > /dev/null
+
       - name: Get Flutter Dependency
         run: flutter pub get
 
@@ -123,11 +131,14 @@ jobs:
         shell: bash
         run: |
           if [ -f build.log ]; then
-            grep -inE "error( |:)|failed|failure|exception|cannot|unable|not found|undefined" build.log | tail -n 10 | while IFS= read -r line; do
+            N=$(grep -n "FAILURE: Build failed" build.log | head -1 | cut -d: -f1)
+            if [ -n "$N" ]; then
+              sed -n "${N},$((N+12))p" build.log | while IFS= read -r line; do
+                echo "::error::CTX ${line:0:450}"
+              done
+            fi
+            grep -inE "error( |:)|failed|failure|exception|cannot|unable|not found|not accepted|licenses|undefined" build.log | tail -n 8 | while IFS= read -r line; do
               echo "::error::${line:0:450}"
-            done
-            tail -n 4 build.log | while IFS= read -r line; do
-              echo "::error::TAIL ${line:0:450}"
             done
           fi
 
