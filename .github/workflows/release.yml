@@ -139,17 +139,29 @@ jobs:
         if: failure()
         shell: bash
         run: |
-          if [ -f build.log ]; then
+          set +e +o pipefail
+          if [ ! -f build.log ]; then
+            echo "::error::no build.log (failed before Build step)"
+            exit 0
+          fi
+          {
             N=$(grep -n "FAILURE: Build failed" build.log | head -1 | cut -d: -f1)
             if [ -n "$N" ]; then
-              sed -n "${N},$((N+12))p" build.log | while IFS= read -r line; do
-                echo "::error::CTX ${line:0:450}"
-              done
+              echo "--- gradle What-went-wrong context ---"
+              sed -n "${N},$((N+12))p" build.log
             fi
-            grep -inE "error( |:)|failed|failure|exception|cannot|unable|not found|not accepted|licenses|undefined" build.log | tail -n 8 | while IFS= read -r line; do
-              echo "::error::${line:0:450}"
-            done
-          fi
+            M=$(grep -n "MSB3073" build.log | head -1 | cut -d: -f1)
+            if [ -n "$M" ]; then
+              S=$((M-22)); [ "$S" -lt 1 ] && S=1
+              echo "--- msbuild first-error context ---"
+              sed -n "${S},${M}p" build.log
+            fi
+            echo "--- matched error lines ---"
+            grep -inE "CMake Error|error MSB|error C[0-9]|error LNK|error( |:)|failed|exception|cannot|unable|not found|not accepted|licenses" build.log | grep -viE "Microsoft\.CppCommon\.targets|:VCEnd|:cmDone|:cmErrorLevel|:cmEnd|errorlevel|Build process failed|Unhandled exception|asynchronous suspension|command_runner|Build\.exec|setup\.dart" | tail -n 14
+          } > probe.txt 2>/dev/null
+          tail -n 10 probe.txt | while IFS= read -r line; do
+            echo "::error::${line:0:450}"
+          done
 
       - name: Upload
         uses: actions/upload-artifact@v6
