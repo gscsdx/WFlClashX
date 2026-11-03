@@ -125,7 +125,20 @@ jobs:
           echo "Wrote ad-hoc signing Local.xcconfig"
 
       - name: Build
-        run: dart setup.dart ${{ matrix.platform }} ${{ matrix.arch && format('--arch {0}', matrix.arch) }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }}
+        shell: bash
+        run: |
+          dart setup.dart ${{ matrix.platform }} ${{ matrix.arch && format('--arch {0}', matrix.arch) }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }} 2>&1 | tee build.log
+          exit ${PIPESTATUS[0]}
+
+      - name: Report build errors
+        if: failure()
+        shell: bash
+        run: |
+          if [ -f build.log ]; then
+            tail -n 10 build.log | while IFS= read -r line; do
+              [ -n "$line" ] && echo "::error::${line:0:500}"
+            done
+          fi
 
       - name: Upload
         uses: actions/upload-artifact@v6

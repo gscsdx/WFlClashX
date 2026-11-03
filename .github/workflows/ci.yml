@@ -61,7 +61,20 @@ jobs:
         run: flutter pub get
 
       - name: Build Android
-        run: dart setup.dart android
+        shell: bash
+        run: |
+          dart setup.dart android 2>&1 | tee build.log
+          exit ${PIPESTATUS[0]}
+
+      - name: Report build errors
+        if: failure()
+        shell: bash
+        run: |
+          if [ -f build.log ]; then
+            tail -n 10 build.log | while IFS= read -r line; do
+              [ -n "$line" ] && echo "::error::${line:0:500}"
+            done
+          fi
 
       - name: Upload APK
         uses: actions/upload-artifact@v6
