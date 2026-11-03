@@ -509,9 +509,8 @@ class BuildCommand extends Command {
   }
 
   _getMacosDependencies() async {
-    await Build.exec(
-      Build.getExecutable("npm install -g create-dmg"),
-    );
+    // Nothing to install: the DMG is produced by hdiutil in _buildMacosApp,
+    // so the create-dmg npm package (which needs a GUI session) is gone.
   }
 
   _buildMacosApp({
@@ -546,22 +545,32 @@ class BuildCommand extends Command {
       distDir.createSync(recursive: true);
     }
 
-    print("Creating DMG with create-dmg...");
-
-    await Build.exec(
-      name: "create-dmg",
-      [
-        "create-dmg",
-        "--overwrite",
-        "--dmg-title",
-        appName,
-        appPath,
-        Build.distPath,
-      ],
-    );
+    // create-dmg styles the DMG window through a Finder AppleScript, which
+    // cannot run on a headless CI runner (no UI session) — it aborts with
+    // "create-dmg error" right at the end of an otherwise successful build.
+    // hdiutil is the macOS built-in, works headless, and produces the same
+    // compressed UDZO image (we just lose the custom window layout).
+    print("Creating DMG with hdiutil...");
 
     final createdDmgName = "$appName $version.dmg";
     final createdDmgPath = join(Build.distPath, createdDmgName);
+
+    await Build.exec(
+      name: "hdiutil create",
+      [
+        "hdiutil",
+        "create",
+        "-volname",
+        appName,
+        "-srcfolder",
+        appPath,
+        "-ov",
+        "-format",
+        "UDZO",
+        createdDmgPath,
+      ],
+    );
+
     final targetDmgName = "$appName-macos-${arch.name}.dmg";
     final targetDmgPath = join(Build.distPath, targetDmgName);
 

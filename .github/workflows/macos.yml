@@ -23,6 +23,7 @@ on:
     # it kicks off one macOS build and later pushes don't queue macOS jobs.
     paths:
       - ".github/workflows/macos.yml"
+      - "setup.dart"
 
 env:
   IS_STABLE: ${{ !contains(github.ref, '-') }}
@@ -57,18 +58,6 @@ jobs:
 
       - name: Get Flutter Dependency
         run: flutter pub get
-
-      # setup.dart runs `npm install -g create-dmg` silently (without checking
-      # the result) and then needs the binary to package the dmg. The default
-      # system prefix is not writable on CI, so point npm at $HOME.
-      - name: Configure npm prefix
-        run: |
-          mkdir -p "$HOME/.npm-global"
-          npm config set prefix "$HOME/.npm-global"
-          echo "$HOME/.npm-global/bin" >> "$GITHUB_PATH"
-
-      - name: Install create-dmg
-        run: npm install -g create-dmg
 
       - name: Disable code signing (no Apple certificate in this repo)
         run: |
