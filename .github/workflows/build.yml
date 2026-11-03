@@ -1,0 +1,153 @@
+name: build
+
+# Cloud build for every client except iOS: android / windows / linux / macos.
+#
+# Secrets-free by design:
+# - Android falls back to the debug keystore (see android/app/build.gradle.kts),
+#   so the produced APKs install fine but are not publishable to stores.
+# - macOS builds are ad-hoc signed (Local.xcconfig with CODE_SIGN_IDENTITY = -),
+#   so the dmg runs locally / via right-click but is not notarized.
+# - On a v* tag push a pre-release (or release, when the tag has no '-') is
+#   created automatically with every artifact attached.
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+env:
+  IS_STABLE: ${{ !contains(github.ref, '-') }}
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: android
+            os: ubuntu-latest
+          - platform: windows
+            os: windows-latest
+            arch: amd64
+          - platform: linux
+            os: ubuntu-24.04
+            arch: amd64
+          - platform: macos
+            os: macos-latest
+            arch: amd64
+          - platform: macos
+            os: macos-latest
+            arch: arm64
+          - platform: windows
+            os: windows-11-arm
+            arch: arm64
+          - platform: linux
+            os: ubuntu-24.04-arm
+            arch: arm64
+
+    steps:
+      - name: Setup Rust for Windows ARM64
+        if: startsWith(matrix.os, 'windows-11-arm')
+        run: |
+          Invoke-WebRequest -Uri "https://win.rustup.rs/aarch64" -OutFile rustup-init.exe
+          .\rustup-init.exe -y --default-toolchain stable
+          $cargoPath = "$env:USERPROFILE\.cargo\bin"
+          Add-Content $env:GITHUB_PATH $cargoPath
+
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: "1.26.0"
+          cache-dependency-path: |
+            core/go.sum
+
+      - name: Setup Java
+        if: matrix.platform == 'android'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Setup Flutter (ARM)
+        if: startsWith(matrix.os, 'windows-11-arm') || startsWith(matrix.os, 'ubuntu-24.04-arm')
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "master"
+          cache: true
+
+      - name: Setup Flutter
+        if: ${{ !(startsWith(matrix.os, 'windows-11-arm') || startsWith(matrix.os, 'ubuntu-24.04-arm')) }}
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.41.7"
+          cache: true
+
+      - run: flutter --version
+
+      # setup.dart reads ANDROID_NDK to pick the clang cross-compilers for the
+      # core. The runner image doesn't always export that exact name, so derive
+      # it from the installed NDK when missing.
+      - name: Resolve Android NDK
+        if: matrix.platform == 'android'
+        run: |
+          if [ -z "${ANDROID_NDK:-}" ]; then
+            NDK_DIR=$(ls -d "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/ndk"/* 2>/dev/null | sort -V | tail -n1)
+            if [ -n "$NDK_DIR" ]; then
+              echo "ANDROID_NDK=$NDK_DIR" >> "$GITHUB_ENV"
+            fi
+          fi
+          echo "ANDROID_NDK=${ANDROID_NDK:-}"
+
+      - name: Get Flutter Dependency
+        run: flutter pub get
+
+      - name: Setup Inno Setup
+        if: matrix.platform == 'windows'
+        run: |
+          choco install innosetup -y
+          echo "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+      - name: Setup macOS ad-hoc signing (no Apple certificate in this repo)
+        if: matrix.platform == 'macos'
+        run: |
+          cat > macos/Runner/Configs/Local.xcconfig << EOF
+          CODE_SIGN_IDENTITY = -
+          CODE_SIGNING_REQUIRED = NO
+          EOF
+          echo "Wrote ad-hoc signing Local.xcconfig"
+
+      - name: Build
+        run: dart setup.dart ${{ matrix.platform }} ${{ matrix.arch && format('--arch {0}', matrix.arch) }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }}
+
+      - name: Upload
+        uses: actions/upload-artifact@v6
+        with:
+          name: artifact-${{ matrix.platform }}${{ matrix.arch && format('-{0}', matrix.arch) }}
+          path: ./dist
+          overwrite: true
+
+  release:
+    needs: [build]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v6
+        with:
+          path: ./dist/
+          pattern: artifact-*
+          merge-multiple: true
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ./dist/*
+          prerelease: ${{ contains(github.ref, '-') }}
+          generate_release_notes: true
