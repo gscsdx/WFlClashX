@@ -330,7 +330,9 @@ class _ModalSideSheetState<T> extends State<_ModalSideSheet<T>> {
       case TargetPlatform.fuchsia:
       case TargetPlatform.linux:
       case TargetPlatform.windows:
-      case TargetPlatform.ohos:
+      default:
+        // The OHOS Flutter fork adds TargetPlatform.ohos — reachable via
+        // default so this file compiles on both the official SDK and the fork.
         return localizations.dialogLabel;
     }
   }
