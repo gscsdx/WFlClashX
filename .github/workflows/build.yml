@@ -29,7 +29,7 @@ jobs:
       matrix:
         include:
           - platform: android
-            os: ubuntu-latest
+            os: ubuntu-24.04
           - platform: windows
             os: windows-latest
             arch: amd64
@@ -91,20 +91,16 @@ jobs:
 
       - run: flutter --version
 
-      # The ubuntu-26 runner image no longer ships the Android NDK, and
-      # setup.dart hard-requires ANDROID_NDK (assert) for the core cross-compile.
-      # Install the exact NDK version pinned in android/app/build.gradle.kts so
-      # both the Go core build and the Gradle APK build use the same toolchain.
-      - name: Setup Android SDK
-        if: matrix.platform == 'android'
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android NDK
+      # Pin to ubuntu-24.04: the ubuntu-26 image dropped the whole Android SDK
+      # (and android-actions/setup-android fails there too). The 24.04 image
+      # ships the SDK + NDK preinstalled with licenses accepted; gradle
+      # auto-installs its pinned ndkVersion (28.0.13004108) via sdkmanager.
+      - name: Resolve Android NDK
         if: matrix.platform == 'android'
         run: |
-          sdkmanager --install "ndk;28.0.13004108" > /dev/null
-          echo "ANDROID_NDK=${ANDROID_SDK_ROOT:-$ANDROID_HOME}/ndk/28.0.13004108" >> "$GITHUB_ENV"
-          test -f "$ANDROID_NDK/source.properties" && echo "NDK installed at $ANDROID_NDK"
+          NDK_DIR=$(ls -d "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/ndk"/* 2>/dev/null | sort -V | tail -n1)
+          echo "ANDROID_NDK=$NDK_DIR" >> "$GITHUB_ENV"
+          echo "Resolved ANDROID_NDK=$NDK_DIR"
 
       - name: Get Flutter Dependency
         run: flutter pub get
