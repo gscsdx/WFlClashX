@@ -13,25 +13,12 @@
 
 A multi-platform proxy client built on the [Clash.Meta (mihomo)](https://github.com/MetaCubeX/mihomo) core: **Flutter for the UI, Go for the core** — open source and ad-free.
 
-This project is a fork of [FlClash](https://github.com/chen08209/FlClash) → [FlClashX](https://github.com/pluralplay/FlClashX), with three major additions:
+This project is a fork of [FlClash](https://github.com/chen08209/FlClash) → [FlClashX](https://github.com/pluralplay/FlClashX), with two major additions:
 
 1. **A native HarmonyOS NEXT port** — an ArkTS `VpnExtensionAbility` drives the same Go core over a NAPI bridge, with the TUN path reimplemented as a pure userspace gVisor stack;
-2. **Fully automated cloud builds** — one GitHub Actions pipeline produces Android / Windows / Linux / macOS installers, with automated releases;
-3. **UI clean-up** — a new gradient splash screen and a trimmed About page (project link only).
+2. **Fully automated cloud builds** — one GitHub Actions pipeline produces Android / Windows / Linux / macOS installers, with automated releases.
 
 > Codename **Wormhole**: the pub package name is `wormhole` and the HarmonyOS bundle name is `com.wormhole.app`. Desktop and Android binaries/installers keep the upstream name `FlClashX`.
-
-Desktop:
-
-<p align="center">
-  <img alt="desktop" src="snapshots/desktop.gif" width="720">
-</p>
-
-Mobile:
-
-<p align="center">
-  <img alt="mobile" src="snapshots/mobile.gif" width="300">
-</p>
 
 ---
 
@@ -92,8 +79,6 @@ For production distribution you must supply your own certificates (Android keyst
 
 ### UX and UI
 
-- Gradient splash screen, full-bleed, no white flash;
-- About page reduced to a single "Project" entry pointing at [this repository](https://github.com/gscsdx/WFlClashX);
 - Android 120 Hz support; Android TV remote-control improvements (paste button, group picker, QR profile transfer from phone);
 - Native macOS menu-bar mode;
 - Adjustable UI background transparency;

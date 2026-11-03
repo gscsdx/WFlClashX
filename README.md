@@ -13,25 +13,12 @@
 
 基于 [Clash.Meta（mihomo）](https://github.com/MetaCubeX/mihomo) 内核的多平台代理客户端：**Flutter 写界面，Go 写内核**，开源、无广告。
 
-本项目 Fork 自 [FlClash](https://github.com/chen08209/FlClash) → [FlClashX](https://github.com/pluralplay/FlClashX)，在此基础上完成了三件主要工作：
+本项目 Fork 自 [FlClash](https://github.com/chen08209/FlClash) → [FlClashX](https://github.com/pluralplay/FlClashX)，在此基础上完成了两件主要工作：
 
 1. **新增鸿蒙（HarmonyOS NEXT）原生端** —— ArkTS `VpnExtensionAbility` + NAPI 桥接同一套 Go 内核，TUN 链路改为 gVisor 纯用户态实现；
-2. **全平台云端构建** —— GitHub Actions 一条流水线产出 Android / Windows / Linux / macOS 安装包，发版自动化；
-3. **界面整理** —— 新增渐变启动页，精简「关于」页面（仅保留项目地址）。
+2. **全平台云端构建** —— GitHub Actions 一条流水线产出 Android / Windows / Linux / macOS 安装包，发版自动化。
 
 > 项目代号 **Wormhole**：`pubspec.yaml` 中包名为 `wormhole`，鸿蒙 BundleName 为 `com.wormhole.app`；桌面与 Android 的可执行文件、安装包沿用上游名称 `FlClashX`。
-
-桌面端界面：
-
-<p align="center">
-  <img alt="desktop" src="snapshots/desktop.gif" width="720">
-</p>
-
-移动端界面：
-
-<p align="center">
-  <img alt="mobile" src="snapshots/mobile.gif" width="300">
-</p>
 
 ---
 
@@ -92,8 +79,6 @@
 
 ### 体验与界面
 
-- 渐变启动页，全屏铺满、无白屏闪烁；
-- 「关于」页精简为唯一一项「项目」，指向 [本仓库](https://github.com/gscsdx/WFlClashX)；
 - Android 120Hz 高刷支持；Android TV 遥控器操作优化（粘贴按钮、策略组选择、手机扫码传配置）；
 - macOS 原生状态栏常驻；
 - 界面背景透明度可调；

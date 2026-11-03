@@ -13,25 +13,12 @@
 
 Мультиплатформенный прокси-клиент на ядре [Clash.Meta (mihomo)](https://github.com/MetaCubeX/mihomo): **интерфейс на Flutter, ядро на Go** — открытый исходный код, без рекламы.
 
-Проект является форком [FlClash](https://github.com/chen08209/FlClash) → [FlClashX](https://github.com/pluralplay/FlClashX). В этом репозитории добавлены три основные вещи:
+Проект является форком [FlClash](https://github.com/chen08209/FlClash) → [FlClashX](https://github.com/pluralplay/FlClashX). В этом репозитории добавлены две основные вещи:
 
 1. **Нативная версия для HarmonyOS NEXT** — ArkTS `VpnExtensionAbility` управляет тем же ядром на Go через NAPI-мост, а стек TUN переписан как полностью пользовательская реализация gVisor;
-2. **Облачная сборка для всех платформ** — один конвейер GitHub Actions выпускает установщики для Android / Windows / Linux / macOS, релизы автоматизированы;
-3. **Наведение порядка в интерфейсе** — новый градиентный экран запуска и сокращённая страница «О программе» (осталась только ссылка на проект).
+2. **Облачная сборка для всех платформ** — один конвейер GitHub Actions выпускает установщики для Android / Windows / Linux / macOS, релизы автоматизированы.
 
 > Кодовое имя **Wormhole**: имя пакета в `pubspec.yaml` — `wormhole`, BundleName для HarmonyOS — `com.wormhole.app`; исполняемые файлы и установщики для десктопа и Android сохраняют имя `FlClashX`.
-
-Десктопный вид:
-
-<p align="center">
-  <img alt="desktop" src="snapshots/desktop.gif" width="720">
-</p>
-
-Мобильный вид:
-
-<p align="center">
-  <img alt="mobile" src="snapshots/mobile.gif" width="300">
-</p>
 
 ---
 
@@ -92,8 +79,6 @@
 
 ### Интерфейс
 
-- Градиентный экран запуска на весь экран, без белой вспышки;
-- Страница «О программе» сокращена до одного пункта «Проект» со ссылкой на [этот репозиторий](https://github.com/gscsdx/WFlClashX);
 - Поддержка 120 Гц на Android; оптимизация управления с пульта Android TV (кнопка «Вставить», выбор группы, передача профиля по QR с телефона);
 - Нативный режим строки состояния в macOS;
 - Настраиваемая прозрачность фона интерфейса;
