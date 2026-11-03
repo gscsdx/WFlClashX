@@ -7,13 +7,15 @@ name: build
 #   so the produced APKs install fine but are not publishable to stores.
 # - macOS builds are ad-hoc signed (Local.xcconfig with CODE_SIGN_IDENTITY = -),
 #   so the dmg runs locally / via right-click but is not notarized.
-# - On a v* tag push a pre-release (or release, when the tag has no '-') is
-#   created automatically with every artifact attached.
+#
+# NOTE: tags are handled by release.yml — do NOT add a `tags` filter next to
+# `branches` here: when both are defined the push event must match BOTH
+# (branches AND tags), which no push ever does.
 on:
   workflow_dispatch:
   push:
-    tags:
-      - "v*"
+    branches:
+      - main
 
 env:
   IS_STABLE: ${{ !contains(github.ref, '-') }}
@@ -89,19 +91,20 @@ jobs:
 
       - run: flutter --version
 
-      # setup.dart reads ANDROID_NDK to pick the clang cross-compilers for the
-      # core. The runner image doesn't always export that exact name, so derive
-      # it from the installed NDK when missing.
-      - name: Resolve Android NDK
+      # The ubuntu-26 runner image no longer ships the Android NDK, and
+      # setup.dart hard-requires ANDROID_NDK (assert) for the core cross-compile.
+      # Install the exact NDK version pinned in android/app/build.gradle.kts so
+      # both the Go core build and the Gradle APK build use the same toolchain.
+      - name: Setup Android SDK
+        if: matrix.platform == 'android'
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK
         if: matrix.platform == 'android'
         run: |
-          if [ -z "${ANDROID_NDK:-}" ]; then
-            NDK_DIR=$(ls -d "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/ndk"/* 2>/dev/null | sort -V | tail -n1)
-            if [ -n "$NDK_DIR" ]; then
-              echo "ANDROID_NDK=$NDK_DIR" >> "$GITHUB_ENV"
-            fi
-          fi
-          echo "ANDROID_NDK=${ANDROID_NDK:-}"
+          sdkmanager --install "ndk;28.0.13004108" > /dev/null
+          echo "ANDROID_NDK=${ANDROID_SDK_ROOT:-$ANDROID_HOME}/ndk/28.0.13004108" >> "$GITHUB_ENV"
+          test -f "$ANDROID_NDK/source.properties" && echo "NDK installed at $ANDROID_NDK"
 
       - name: Get Flutter Dependency
         run: flutter pub get
@@ -130,24 +133,3 @@ jobs:
           name: artifact-${{ matrix.platform }}${{ matrix.arch && format('-{0}', matrix.arch) }}
           path: ./dist
           overwrite: true
-
-  release:
-    needs: [build]
-    if: startsWith(github.ref, 'refs/tags/v')
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v6
-        with:
-          path: ./dist/
-          pattern: artifact-*
-          merge-multiple: true
-
-      - name: Create release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: ./dist/*
-          prerelease: ${{ contains(github.ref, '-') }}
-          generate_release_notes: true

@@ -45,18 +45,17 @@ jobs:
           flutter-version: "3.41.7"
           cache: true
 
-      # setup.dart reads ANDROID_NDK to pick the clang cross-compilers for the
-      # core. The runner image doesn't always export that exact name, so derive
-      # it from the installed NDK when missing.
-      - name: Resolve Android NDK
+      # The ubuntu-26 runner image no longer ships the Android NDK and
+      # setup.dart hard-requires ANDROID_NDK (assert). Install the exact NDK
+      # version pinned in android/app/build.gradle.kts.
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android NDK
         run: |
-          if [ -z "${ANDROID_NDK:-}" ]; then
-            NDK_DIR=$(ls -d "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/ndk"/* 2>/dev/null | sort -V | tail -n1)
-            if [ -n "$NDK_DIR" ]; then
-              echo "ANDROID_NDK=$NDK_DIR" >> "$GITHUB_ENV"
-            fi
-          fi
-          echo "ANDROID_NDK=${ANDROID_NDK:-$NDK_DIR}"
+          sdkmanager --install "ndk;28.0.13004108" > /dev/null
+          echo "ANDROID_NDK=${ANDROID_SDK_ROOT:-$ANDROID_HOME}/ndk/28.0.13004108" >> "$GITHUB_ENV"
+          test -f "$ANDROID_NDK/source.properties" && echo "NDK installed at $ANDROID_NDK"
 
       - name: Get Flutter dependencies
         run: flutter pub get
