@@ -1,6 +1,6 @@
 <div align="right">
 
-**简体中文** · [English](README_EN.md)
+**简体中文** · [English](README_EN.md) · [Русский](README_RU.md)
 
 </div>
 
