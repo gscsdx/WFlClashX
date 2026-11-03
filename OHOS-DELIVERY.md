@@ -173,10 +173,3 @@ MSYS_NO_PATHCONV=1 hdc shell "ps -ef | grep clashx"               # 主进程 + 
 6. **后续迭代建议**：连接断线自动重连的 UI 提示；节点健康检查在锁屏期间的节流（省电）；发布版签名（当前 debug 签名）。
 
 ---
-
-## 8. 交接索引
-
-- 项目工作日志：`.workbuddy/memory/2026-11-03.md`（完整根因链与调试手法）
-- 诊断产物：`_diag/`（截图、布局 dump、hilog 全量抓取、构建日志）
-- 鸿蒙工程说明：`ohos/README.md`（签名/ACL/目录结构）
-- 签名材料备份：`_diag/material-backup-20261103/`（只读，勿删）
