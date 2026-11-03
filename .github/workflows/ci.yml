@@ -63,33 +63,28 @@ jobs:
           dart setup.dart android 2>&1 | tee build.log
           exit ${PIPESTATUS[0]}
 
-      - name: Report build errors
+      - name: Probe gradle/xcode context
         if: failure()
         shell: bash
         run: |
           set +e +o pipefail
-          if [ ! -f build.log ]; then
-            echo "::error::no build.log (failed before Build step)"
-            exit 0
-          fi
+          [ -f build.log ] || exit 0
           {
             N=$(grep -n "FAILURE: Build failed" build.log | head -1 | cut -d: -f1)
-            if [ -n "$N" ]; then
-              echo "--- gradle What-went-wrong context ---"
-              sed -n "${N},$((N+12))p" build.log
-            fi
-            M=$(grep -n "MSB3073" build.log | head -1 | cut -d: -f1)
-            if [ -n "$M" ]; then
-              S=$((M-22)); [ "$S" -lt 1 ] && S=1
-              echo "--- msbuild first-error context ---"
-              sed -n "${S},${M}p" build.log
-            fi
-            echo "--- matched error lines ---"
-            grep -inE "CMake Error|error MSB|error C[0-9]|error LNK|error( |:)|failed|exception|cannot|unable|not found|not accepted|licenses" build.log | grep -viE "Microsoft\.CppCommon\.targets|:VCEnd|:cmDone|:cmErrorLevel|:cmEnd|errorlevel|Build process failed|Unhandled exception|asynchronous suspension|command_runner|Build\.exec|setup\.dart" | tail -n 14
-          } > probe.txt 2>/dev/null
-          tail -n 10 probe.txt | while IFS= read -r line; do
-            echo "::error::${line:0:450}"
-          done
+            [ -n "$N" ] && sed -n "${N},$((N+11))p" build.log
+            X=$(grep -n "BUILD FAILED" build.log | head -1 | cut -d: -f1)
+            if [ -n "$X" ]; then F=$((X-12)); [ "$F" -lt 1 ] && F=1; sed -n "${F},${X}p" build.log; fi
+          } 2>/dev/null | tail -n 9 | while IFS= read -r line; do echo "::error::CTX ${line:0:440}"; done
+
+      - name: Probe matched error lines
+        if: failure()
+        shell: bash
+        run: |
+          set +e +o pipefail
+          [ -f build.log ] || exit 0
+          grep -inE "CMake Error|error MSB|error LNK|error C[0-9]|error:|fatal error|cannot find|No such file" build.log 2>/dev/null \
+            | grep -viE "ld: warning|warning:|Pods\.xcodeproj|Microsoft\.CppCommon|errorlevel|:VCEnd|asynchronous suspension|setup\.dart|Build\.exec|command_runner" \
+            | tail -n 10 | while IFS= read -r line; do echo "::error::${line:0:440}"; done
 
       - name: Upload APK
         uses: actions/upload-artifact@v6
