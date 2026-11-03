@@ -1,7 +1,5 @@
 # Wormhole 鸿蒙版（OHOS）
 
-> **包名 `com.follow.clashx` → `com.wormhole.app`。
-
 >  ｜ 包名：com.wormhole.app ｜ 真机：华为 (HarmonyOS 5.x)
 >
 > 本文档覆盖从「应用可运行」到「VPN 全链路可用」的三项攻坚成果：**TUN TCP 链路打通**、**后台保活（锁屏存活）**、**构建链修复**。目标读者：接手本项目的工程师。
