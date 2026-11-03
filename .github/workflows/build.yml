@@ -7,6 +7,10 @@ name: build
 # used to poison every main push. macOS lives in macos.yml and can be
 # dispatched on demand.
 #
+# Manual trigger only: a plain `git push` must not burn 5 runners while you
+# are iterating on another platform. Start this one from
+# Actions -> build -> Run workflow.
+#
 # Secrets-free by design:
 # - Android falls back to the debug keystore (see android/app/build.gradle.kts),
 #   so the produced APKs install fine but are not publishable to stores.
@@ -16,9 +20,6 @@ name: build
 # (branches AND tags), which no push ever does.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 env:
   IS_STABLE: ${{ !contains(github.ref, '-') }}
