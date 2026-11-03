@@ -1,425 +1,273 @@
-<div>
+<div align="right">
 
-[**English**](README_EN.md)
+**简体中文** · [English](README_EN.md)
 
 </div>
 
-## FlClashX
+# FlClashX
 
-[![Downloads](https://img.shields.io/github/downloads/pluralplay/FlClashX/total?style=flat-square&logo=github)](https://github.com/pluralplay/FlClashX/releases/)
-[![Last Version](https://img.shields.io/github/release/pluralplay/FlClashX/all.svg?style=flat-square)](https://github.com/pluralplay/FlClashX/releases/)
-[![License](https://img.shields.io/github/license/pluralplay/FlClashX?style=flat-square)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/gscsdx/WFlClashX?style=flat-square&logo=github)](https://github.com/gscsdx/WFlClashX/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/gscsdx/WFlClashX/total?style=flat-square)](https://github.com/gscsdx/WFlClashX/releases)
+[![Cloud build](https://img.shields.io/github/actions/workflow/status/gscsdx/WFlClashX/build.yml?style=flat-square&label=cloud%20build)](https://github.com/gscsdx/WFlClashX/actions)
+[![License](https://img.shields.io/github/license/gscsdx/WFlClashX?style=flat-square)](LICENSE)
 
-[![Channel](https://img.shields.io/badge/Telegram-Chat-blue?style=flat-square&logo=telegram)](https://t.me/FlClashX)
+基于 [Clash.Meta（mihomo）](https://github.com/MetaCubeX/mihomo) 内核的多平台代理客户端：**Flutter 写界面，Go 写内核**，开源、无广告。
 
-Форк многоплатформенного прокси-клиента FlClash на основе ClashMeta, простого и удобного в использовании, с открытым исходным кодом и без рекламы.
+本项目 Fork 自 [FlClash](https://github.com/chen08209/FlClash) → [FlClashX](https://github.com/pluralplay/FlClashX)，在此基础上完成了三件主要工作：
 
-Десктопный вид:
+1. **新增鸿蒙（HarmonyOS NEXT）原生端** —— ArkTS `VpnExtensionAbility` + NAPI 桥接同一套 Go 内核，TUN 链路改为 gVisor 纯用户态实现；
+2. **全平台云端构建** —— GitHub Actions 一条流水线产出 Android / Windows / Linux / macOS 安装包，发版自动化；
+3. **界面整理** —— 新增渐变启动页，精简「关于」页面（仅保留项目地址）。
 
-<p style="text-align: center;">
-    <img alt="desktop" src="snapshots/desktop.gif">
+> 项目代号 **Wormhole**：`pubspec.yaml` 中包名为 `wormhole`，鸿蒙 BundleName 为 `com.wormhole.app`；桌面与 Android 的可执行文件、安装包沿用上游名称 `FlClashX`。
+
+桌面端界面：
+
+<p align="center">
+  <img alt="desktop" src="snapshots/desktop.gif" width="720">
 </p>
 
-Мобильный вид:
+移动端界面：
 
-<p style="text-align: center;">
-    <img alt="mobile" src="snapshots/mobile.gif">
+<p align="center">
+  <img alt="mobile" src="snapshots/mobile.gif" width="300">
 </p>
 
-## Добавленный функционал
+---
 
-🛠️ Исправлены стандартные настройки: режим поиска процессов вкл, режим tun вкл, режим системного прокси выкл, режим отображения списка прокси list, изменена работа камеры при добавлении подписки через QR.
+## 平台支持
 
-📱 **Поддержка 120Гц дисплеев на Android:** Добавлена поддержка высокочастотных дисплеев (120Гц) на устройствах Android для более плавных анимаций и прокрутки.
+| 平台 | 架构 | 产物格式 | 状态 |
+| --- | --- | --- | --- |
+| **Android** | arm64-v8a / armeabi-v7a / x86_64 | APK（含 universal 包） | ✅ 云端构建 |
+| **Windows** | amd64 / arm64 | ZIP + Inno Setup 安装器 | ✅ 云端构建 |
+| **Linux** | amd64 / arm64 | deb / rpm / AppImage | ✅ 云端构建 |
+| **macOS** | amd64 / arm64 | DMG | ✅ 云端构建 |
+| **HarmonyOS NEXT** | arm64 | HAP | ✅ 本机构建（需 DevEco 签名） |
 
-🗑️ **Очистка данных приложения:** Добавлена кнопка "Очистить данные" в настройках приложения, которая удаляет все профили из папки profiles. Полезно для устранения неполадок или сброса приложения.
+内核版本：mihomo `v1.19.28`；TUN 栈基于 `metacubex/sing-tun v0.4.21`（鸿蒙端使用仓库内置的 vendored 分支）。
 
-🇷🇺 Добавлен русский язык в установщик и переработана локаль в приложении
+---
 
-✈️ Передача HWID в панель (Работает только с <a href="https://github.com/remnawave/panel">Remnawave</a>)
+## 下载
 
-💻 Добавлен новый виджет "Анонсы". Передаёт анонсы из панели в виджет. (Работает только с <a href="https://github.com/remnawave/panel">Remnawave</a>)
+前往 [**Releases**](https://github.com/gscsdx/WFlClashX/releases/latest) 下载对应平台的安装包。以 `v0.4.2` 为例共 14 个产物：
 
-📺 Оптимизация управления на Android TV
+| 平台 | 文件 |
+| --- | --- |
+| Android | `FlClashX-android-arm64-v8a.apk`、`-armeabi-v7a.apk`、`-x86_64.apk`、`-universal.apk` |
+| Windows | `FlClashX-windows-amd64.zip` / `-setup.exe`、`FlClashX-windows-arm64.zip` / `-setup.exe` |
+| Linux | `FlClashX-linux-amd64.AppImage` / `.deb` / `.rpm`、`FlClashX-linux-arm64.deb` |
+| macOS | `FlClashX-macos-amd64.dmg`、`FlClashX-macos-arm64.dmg` |
 
-- добавлена кнопка "Вставить" для меню добавления подписки по ссылке
-- добавлена кнопка выбора профиля
-- добавлена передача профиля с мобильного приложения через QR-код
+### 签名说明（重要）
 
-💻 macOS - приложение в нативной строке состояния (status bar) вместо оконного интерфейса.
+云端构建**不携带任何商业签名证书**，因此：
 
-🪪 Переработана карточка профиля на странице профиля и виджет на главной:
+- **Android**：APK 使用 debug 签名，可直接安装测试，但**不能上架应用商店**；
+- **Windows**：未做代码签名，SmartScreen 会提示「未知发布者」，选择「仍要运行」即可；
+- **macOS**：dmg 未签名、未公证，首次打开请 **右键 →「打开」**，或执行 `xattr -cr /Applications/FlClashX.app`；
+- **Linux**：deb / rpm 未签名；AppImage 需先 `chmod +x`。
 
-- Используется индикатор объёма трафика с изменением цвета (не отображается, если трафик неограничен).
-- Отображается дата окончания подписки (если год — 2099, выводится «Ваша подписка вечная»).
-- Добавлена новая кнопка «Поддержка» в профиле, которая подтягивает supportUrl с панели.
-- Параметр autoupdateinterval для профиля теперь корректно передаётся с панели.
-- Добавлен виджет "MetaInfo". Передаёт параметры с подписки на виджет. Сколько трафика осталось, когда заканчивается подписка, имя профиля, и крупно отображает сколько дней до окончании подписки осталось (за 3 дня до окончания).
-- Добавлен виджет "serviceInfo". Передаёт название вашего сервиса. Можно передать дополнительно хедер `flclashx-servicelogo` для кастомного лого (поддерживается ссылка svg/png), дополнительно по клику открыватеся ссылка на поддержку (supportURL)
-- Добавлен виджет "changeServerButton". По клику перенаправляет на страницу прокси.
+如需正式分发，请自行配置签名证书（Android keystore、Apple Developer ID、Windows 代码签名证书）。
 
-### Добавлен парсинг кастомных хедеров со страницы подписки:
+---
 
-<details>
-<summary><strong>flclashx-widgets</strong></summary>
+## 功能特性
 
-Выстраивает виджеты в порядке, полученным с подписки
+### 代理内核
 
-|       Значение       | Виджет                                                      |
-| :------------------: | ----------------------------------------------------------- |
-|      `announce`      | Анонсы                                                      |
-|    `networkSpeed`    | Скорость сети                                               |
-|   `outboundModeV2`   | Режим работы прокси (новый вид)                             |
-|    `outboundMode`    | Режим работы прокси (старый вид)                            |
-|    `trafficUsage`    | Использование трафика                                       |
-|  `networkDetection`  | Определение локации и IP                                    |
-|     `tunButton`      | Кнопка TUN (только Desktop)                                 |
-|     `vpnButton`      | Кнопка VPN (только Android)                                 |
-| `systemProxyButton`  | Кнопка системного прокси (только Desktop)                   |
-|     `intranetIp`     | Локальный IP-адрес                                          |
-|     `memoryInfo`     | Использование памяти                                        |
-|      `metainfo`      | Информация о подписке                                       |
-| `changeServerButton` | Кнопка смены сервера                                        |
-|    `serviceInfo`     | Информация о сервисе (работает только с header flclashx-servicename) |
+- 基于 mihomo 的规则引擎：规则 / 全局 / 直连三种模式，支持订阅、策略组、延迟测速、连接列表与实时流量统计；
+- TUN 模式（Windows / Linux / macOS / Android / HarmonyOS）与系统代理模式（桌面端）；
+- 分应用代理（Android / 鸿蒙）、进程匹配、DNS 与 GeoIP 分流。
 
-Использование:
+### 订阅面板集成（面向 [Remnawave](https://github.com/remnawave/panel)）
 
-```bash
+- **HWID 上报**：向面板上报设备指纹；
+- **公告组件**：把面板公告显示在首页；
+- **Meta-Info 组件**：剩余流量、到期时间、订阅名称，临近到期（3 天内）高亮提示；
+- **serviceInfo 组件**：显示服务名与自定义 Logo，点击打开支持链接；
+- **changeServerButton**：一键跳转代理页；
+- **组件顺序由订阅控制**：见下方 `flclashx-widgets`。
+
+### 体验与界面
+
+- 渐变启动页，全屏铺满、无白屏闪烁；
+- 「关于」页精简为唯一一项「项目」，指向 [本仓库](https://github.com/gscsdx/WFlClashX)；
+- Android 120Hz 高刷支持；Android TV 遥控器操作优化（粘贴按钮、策略组选择、手机扫码传配置）；
+- macOS 原生状态栏常驻；
+- 界面背景透明度可调；
+- 多语言：简体中文 / English / 日本語 / Русский。
+
+### 鸿蒙（HarmonyOS NEXT）原生端
+
+- `VpnExtensionAbility` 承载 VPN 扩展进程，与主进程通过 RPC 通信，内核异常时按重启预算兜底；
+- Go 内核以 `c-shared` 方式编译为 `libclash_core.so`，通过 NAPI 回调桥接，不依赖 gomobile / JVM；
+- **TUN 关键适配**：OHOS 对 `VpnService` 文件描述符的 `fstat()` 返回 `EACCES`，导致 gVisor 的 fdbased 端点无法初始化。此处改用**纯用户态 channel 端点**，并以 `unix.Read/Write + unix.Poll` 原始系统调用搬运数据包，绕开 netpoller 对 `fstat` 的依赖（实现见 `core/third_party/sing-tun/tun_linux_gvisor.go`）；
+- 架构说明、踩坑记录与验证数据见 [**OHOS-DELIVERY.md**](OHOS-DELIVERY.md)，环境与构建步骤见 [ohos/README.md](ohos/README.md)。
+
+---
+
+## 订阅侧自定义
+
+客户端会读取订阅 HTTP 响应头与 YAML 配置中的若干 `flclashx-*` 扩展键，用于定制首页与代理页外观。
+
+### HTTP 响应头
+
+| 响应头 | 作用 |
+| --- | --- |
+| `flclashx-servicename` | 服务名称（显示在 serviceInfo 组件） |
+| `flclashx-servicelogo` | 服务 Logo（支持 svg / png 链接） |
+| `flclashx-supporturl` | 支持链接，点击 serviceInfo 打开 |
+| `flclashx-widgets` | 首页组件顺序与显隐，逗号分隔 |
+| `flclashx-view` | 代理页展示样式 |
+
+`flclashx-widgets` 可用值：
+
+| 值 | 组件 | 值 | 组件 |
+| --- | --- | --- | --- |
+| `announce` | 公告 | `intranetIp` | 内网 IP |
+| `networkSpeed` | 网速 | `memoryInfo` | 内存占用 |
+| `outboundModeV2` | 代理模式（新版） | `metainfo` | 订阅信息 |
+| `outboundMode` | 代理模式（旧版） | `changeServerButton` | 切换服务器 |
+| `trafficUsage` | 流量用量 | `serviceInfo` | 服务信息 |
+| `networkDetection` | 出口 IP 与地区 | `tunButton` | TUN 开关（桌面） |
+| `vpnButton` | VPN 开关（Android） | `systemProxyButton` | 系统代理开关（桌面） |
+
+示例：
+
+```
 flclashx-widgets: announce,metainfo,outboundModeV2,networkDetection
 ```
-</details>
 
-<details>
-<summary><strong>flclashx-view</strong></summary>
+### YAML 配置键
 
-Настраивает вид страницы прокси, полученным с подписки
+- `flclashx-override`（写在 `GLOBAL` 策略组内）：为 `true` 时，全局模式下的代理页只显示该组内的节点与顺序，隐藏规则模式使用的服务分组；
+- `description`（任意策略组）：替代默认副标题，显示在策略组名称下方。
 
-| Значение | Описание                            | Возможные значения                |
-| :------: | ----------------------------------- | --------------------------------- |
-|  `type`  | Режим отображения                   | `list`,`tab`                      |
-|  `sort`  | Тип сортировки                      | `none`,`delay`,`name`             |
-| `layout` | Макет                               | `loose`,`standard`,`tight`        |
-|  `icon`  | Стиль иконок (для list-отображения) | `none`,`icon`          |
-|  `card`  | Размер карточки                     | `expand`,`shrink`,`min`,`oneline` |
+---
 
-Использование:
+## 从源码构建
 
-```bash
-flclashx-view: type:list; sort:delay; layout:tight; icon:icon; card:shrink
-```
-</details>
+### 环境要求
 
-<details>
-<summary><strong>flclashx-custom</strong></summary>
-
-Управляет состоянием применения стилей для Dashboard и ProxyView
-
-| Значение | Описание                                                |
-| :------: | ------------------------------------------------------- |
-|  `add`   | Стиль страницы прокси и виджеты применяются только при первом добавлении подписки |
-| `update` | Стиль страницы прокси и виджеты применяются каждый раз при обновлении подписки    |
-
-Использование:
+| 用途 | 依赖 |
+| --- | --- |
+| 通用 | Flutter（CI 固定 **3.41.7**）、Dart SDK ≥ 3.5、Go ≥ 1.20（CI 使用 **1.26**） |
+| Android | Android SDK + NDK **28.0.13004108** |
+| Windows | Visual Studio 2022（C++ 桌面负载）、Inno Setup 6（打安装器） |
+| Linux | `clang`、`cmake`、`ninja-build`、`libgtk-3-dev` |
+| macOS | Xcode |
+| HarmonyOS | DevEco Studio 5.0+、Flutter-OH SDK、鸿蒙 Go 工具链 |
 
 ```bash
-flclashx-custom: update
+flutter pub get
 ```
-</details>
 
-<details>
-<summary><strong>flclashx-denywidgets</strong></summary>
+### 桌面 / Android
 
-При true — запрещает редактировать страницу Dashboard. Имеет значение true/false.
-
-Использование:
+构建入口是仓库根目录的 `setup.dart`（先交叉编译 Go 内核，再调用 `flutter build` 并打包）：
 
 ```bash
-flclashx-denywidgets: true
+# 语法：dart setup.dart <android|windows|linux|macos> [--arch amd64|arm64] [--env stable]
+dart setup.dart android                  # Android APK（全架构）
+dart setup.dart windows --arch amd64
+dart setup.dart linux   --arch arm64
+dart setup.dart macos   --arch arm64 --env stable
 ```
-</details>
 
-<details>
-<summary><strong>flclashx-servicename</strong></summary>
+产物统一输出到 `dist/`。
 
-Название вашего сервиса, отображаемое в виджете ServiceInfo.
-
-Использование:
+常用组合也提供了 Makefile 快捷方式：
 
 ```bash
-flclashx-servicename: FlClashX
+make android_app        # Android 全架构
+make android_arm64      # Android arm64
+make macos_arm64        # macOS arm64
+make macLocal           # 清空 dist/build 后重编 macOS arm64（stable）
+make cleanLocal         # 清理 dist 与 build
 ```
-</details>
 
-<details>
-<summary><strong>flclashx-servicelogo</strong></summary>
-
-Ваш логотип, используемый в виджете ServiceInfo (работает только с активным хедером flclashx-servicename). Поддерживает png/svg.
-
-Использование:
+### 鸿蒙（HarmonyOS NEXT）
 
 ```bash
-flclashx-servicelogo: https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/remnawave.svg
+# ① 交叉编译 Go 内核 → ohos/entry/libs/arm64-v8a/libclash_core.so
+cd core
+OHOS_GO=/path/to/ohos-go/bin/go \
+OHOS_NDK=/path/to/sdk/default/openharmony/native \
+  ./build_ohos.sh
+
+# ② 打包 HAP
+cd ..
+flutter build hap --target-platform ohos-arm64 --release
+# 或仅用 hvigor：cd ohos && hvigorw assembleHap
 ```
-</details>
 
-<details>
-<summary><strong>flclashx-serverinfo</strong></summary>
+注意事项：
 
-Название прокси-группы для отображения в виджете ChangeServerButton. Виджет показывает активный сервер из указанной группы с флагом страны, пингом и кнопкой для быстрого переключения. Если не передаётся — работает фолбек на «Изменить сервер»
+- 必须使用 **Flutter-OH**（`gitee.com/openharmony-sig/flutter_flutter`），不要用官方 Flutter，也不要执行 `flutter upgrade`；
+- 首次构建需先把 Flutter-OH 生成的 `har/`、`GeneratedPluginRegistrant.ets` 与签名配置合并进 `ohos/`；
+- **改了 `.so` 后必须清掉 native 缓存再打包**（`ohos/entry/build/default/intermediates/{stripped_native_libs,libs}`），否则会打进旧内核；
+- 签名需在 DevEco Studio 中配置（`File → Project Structure → Signing Configs`）；受限 ACL 权限（`ACCESS_EXTENSIONAL_DEVICE_DRIVER`）需在签名 Profile 的 `allowed-acls` 中声明。
 
-**Отображаемые элементы:**
-- Флаг страны (автоматически извлекается из имени прокси, если отсутствует — фолбек иконка)
-- Название активного сервера
-- Текущий пинг с цветовой индикацией (зелёный < 600ms, оранжевый >= 600ms, красный — timeout)
-- Кнопка быстрого перехода на страницу прокси
+完整手册见 [ohos/README.md](ohos/README.md) 与 [OHOS-DELIVERY.md](OHOS-DELIVERY.md)。
 
-Использование:
+---
+
+## 云端构建（GitHub Actions）
+
+仓库内置四个工作流，全部**无需任何密钥**即可运行：
+
+| 工作流 | 触发方式 | 内容 |
+| --- | --- | --- |
+| `ci.yml` | push 到 main（改动 `lib/**`、`core/**`、`setup.dart`、`pubspec*`） | Android 冒烟构建，验证代码可编译 |
+| `build.yml` | **手动触发**（Actions → build → Run workflow） | Android + Windows(amd64/arm64) + Linux(amd64/arm64)，共 5 个作业 |
+| `macos.yml` | 手动触发，或 `setup.dart` / 自身改动时 | macOS amd64 + arm64 两个 DMG |
+| `release.yml` | 推送 `v*` 标签 | 7 个平台构建 + 自动创建 GitHub Release |
+
+为什么 macOS 单独拆出来：GitHub 的 macOS runner 极其抢手，排队过久会被取消（`The job was not acquired by Runner of type hosted`）。把它从 5 平台矩阵中拆开，能显著提高拿到 runner 的概率。
+
+### 发版流程
 
 ```bash
-flclashx-serverinfo: Proxy
-```
-</details>
-
-<details>
-<summary><strong>flclashx-background</strong></summary>
-
-Устанавливает пользовательское фоновое изображение для приложения. Укажите прямую ссылку на изображение. Опционально через запятую можно задать прозрачность (видимость) фона от 1 до 100 (чем больше — тем заметнее изображение; без параметра — стандартный приглушённый вид).
-
-**Рекомендации для изображения:**
-- Формат: PNG, JPG или WebP
-- Разрешение: 1920x1080 или выше для десктопа, 1080x1920 для мобильных устройств
-- Размер файла: Желательно до 2МБ для лучшей производительности
-- Содержание: Используйте изображения с тонкими узорами или градиентами; избегайте слишком ярких или загруженных изображений
-- Контраст: Обеспечьте хорошую читаемость текста на фоне
-
-Использование:
-
-```bash
-flclashx-background: https://example.com/background.jpg
-# с прозрачностью (1-100, выше = заметнее фон):
-flclashx-background: https://example.com/background.jpg,30
-```
-</details>
-
-<details>
-<summary><strong>flclashx-settings</strong></summary>
-
-Управление настройками приложения через хедер (с возможностью переопределения со стороны клиента). По умолчанию все параметры выключены. Если вы передаёте параметр, то он будет включён. Если не передаёте — останется выключенным.
-
-|   Параметр    | Описание                                                 | По умолчанию |
-| :-----------: | -------------------------------------------------------- | :----------: |
-|  `minimize`   | Сворачивать приложение при выходе вместо закрытия        | ❌ Выкл      |
-|   `autorun`   | Запускать приложение при старте системы                  | ❌ Выкл      |
-| `shadowstart` | Запускать приложение свернутым в трей                    | ❌ Выкл      |
-|  `autostart`  | Автоматически запускать прокси при запуске приложения    | ❌ Выкл      |
-| `autoupdate`  | Автоматически проверять обновления приложения            | ❌ Выкл      |
-|  `openlogs`   | Включить логирование (вкладка «Логи» и стрим логов ядра) | ❌ Выкл      |
-|`closeconnections`| Разрывать активные соединения при смене прокси/режима | ❌ Выкл      |
-
-> Примечание: `closeconnections` в самом приложении по умолчанию включён, но при использовании `flclashx-settings` состояние задаётся явно — если не передать токен, опция будет выключена.
-
-Переопределение на стороне клиента: Пользователи могут включить «Переопределить настройки провайдера» в настройках приложения, чтобы применять свою локальную конфигурацию вместо настроек из подписки. Соответствующие переключатели в настройках (в т.ч. «Логи» и «Разрывать соединения») редактируются только при включённом «Переопределить настройки провайдера».
-
-Использование:
-
-```bash
-flclashx-settings: minimize, autorun, shadowstart, autostart, autoupdate, openlogs, closeconnections
-```
-</details>
-
-<details>
-<summary><strong>flclashx-globalmode</strong></summary>
-
-Данный хедер при FALSE позволяет скрыть все настройки режима прокси из клиента (трей, страница прокси, виджеты смены режима)
-
-Использование:
-```bash
-flclashx-globalmode: false
-```
-</details>
-
-<details>
-<summary><strong>flclashx-hex</strong></summary>
-
-Данный хедер позволяет настроить тему в приложении, возможность передать основной цвет, вариант, и выбрать "Чисто черный режим" параметром `pureBlack`
-
-Варианты:
-|   Вариант    | Название|
-| :-----------: | ------ |
-|  `tonalSpot`   | Тональный акцент|
-|   `fidelity`   | Точная передача |
-| `monochrome` | Монохром |
-|  `neutral`  | Нейтральные |
-| `vibrant`  | Яркие |
-| `expressive`  | Экспрессивные |
-| `content`  | Контентная тема |
-| `rainbow`  | Радужные |
-| `fruitSalad`  | Фруктовый микс |
-
-Использование:
-```bash
-flclashx-hex: FF5733
-flclashx-hex: FF5733:vibrant
-flclashx-hex: FF5733:vibrant:pureblack
-```
-Так-же можно параметры использовать по отдельности:
-```bash
-flclashx-hex: FF5733
-flclashx-hex: vibrant
-flclashx-hex: pureblack
-```
-HEX-коды стандартных тем:
-|   HEX    | ЦВЕТ|
-| :-----------: | ------ |
-|  `795548`   | Brown (Коричневый)|
-|   `03A9F4`   | Light Blue (Светло-голубой) - по умолчанию |
-| `FFFF00` | Yellow (Желтый) |
-|  `BBC9CC`  | Light Blue Grey (Светло-серо-голубой) |
-| `ABD397`  | Light Green (Светло-зеленый) |
-| `D8C0C3`  | Light Pink (Светло-розовый) |
-| `665390`  | Deep Purple (Темно-фиолетовый) |
-</details>
-
-<details>
-<summary><strong>flclashx-androidsecure</strong></summary>
-
-Данный хедер позволяет принудительно включить Mixed-port:0 только на Андроид-девайсах, при активном 7890 (например) в конфиге.
-
-Использование:
-```bash
-flclashx-androidsecure: true
-```
-</details>
-
-<details>
-<summary><strong>flclashx-newboard</strong></summary>
-
-При `true` включает новый вид главной страницы вместо сетки виджетов: крупное лого и название сервиса, карточка трафика/срока, панель активного сервера (флаг, IP, пинг) с веером доступных локаций, кнопка подключения и нижняя навигация. Редактирование виджетов в этом режиме скрыто. Пользователь может включить тот же вид локально настройкой «Новый вид».
-
-Использование:
-```bash
-flclashx-newboard: true
-```
-</details>
-
-<details>
-<summary><strong>flclashx-newdomain</strong></summary>
-
-Миграция домена подписки. Если значение отличается от текущего хоста ссылки профиля, при следующем обновлении клиент автоматически заменит хост в URL подписки на указанный (путь и параметры сохраняются). Удобно при переезде страницы подписки на новый домен без переустановки профиля у пользователей.
-
-Использование:
-```bash
-flclashx-newdomain: new.example.com
-```
-</details>
-
-<details>
-<summary><strong>flclashx-buyplan</strong></summary>
-
-Прямая ссылка на оплату/продление подписки. Кнопка «Продлить подписку» появляется под карточкой трафика на новой главной (`flclashx-newboard`) только когда до конца подписки остаётся меньше 3 дней (в т.ч. если подписка уже истекла). По нажатию открывается переданная ссылка.
-
-Использование:
-```bash
-flclashx-buyplan: https://example.com/pay
-```
-</details>
-
-<details>
-<summary><strong>flclashx-buytraffic</strong></summary>
-
-Прямая ссылка на докупку трафика. Кнопка «Докупить трафик» появляется под карточкой трафика на новой главной (`flclashx-newboard`) только когда остаётся меньше 10% от лимита трафика. Если сработали оба триггера (`flclashx-buyplan` и `flclashx-buytraffic`), кнопки показываются в один ряд.
-
-Использование:
-```bash
-flclashx-buytraffic: https://example.com/buy-traffic
-```
-</details>
-
-### YAML-ключи в конфиге
-
-Эти ключи указываются не в HTTP-заголовках ответа, а прямо в YAML-конфиге подписки (в секции `proxy-groups`).
-
-<details>
-<summary><strong>flclashx-override</strong> (в группе GLOBAL)</summary>
-
-Указывается внутри прокси-группы `GLOBAL`. При `flclashx-override: true` клиент берёт список и порядок прокси из этой группы как «курированный GLOBAL»: в режиме «Глобальный» в разделе Proxies показывается только группа `GLOBAL` ровно с этими элементами и в этом порядке, а сервисные группы (нужные для rule-режима) скрываются. Без флага поведение прежнее — `GLOBAL` формируется ядром автоматически из всех групп.
-
-Использование:
-```yaml
-proxy-groups:
-  - name: GLOBAL
-    flclashx-override: true
-    type: select
-    proxies:
-      - 🎲 Любой доступный
-      - 🔓 Без VPN
-      - 🌍 Основной VPN
-      - 🇩🇪 Германия
-      - 🇫🇮 Финляндия
-```
-</details>
-
-<details>
-<summary><strong>description</strong> (в любой прокси-группе)</summary>
-
-Кастомный подзаголовок группы в разделе Proxies. По умолчанию под названием группы показывается её тип (Selector/URLTest/Fallback…) либо текущий выбранный узел; если задать `description`, вместо этого выводится указанный текст. Удобно для понятных подписей вложенных групп.
-
-Использование:
-```yaml
-proxy-groups:
-  - name: 🌍 Основной VPN
-    type: select
-    description: Авто-выбор лучшей локации
-    proxies:
-      - 🇩🇪 Германия
-      - 🇫🇮 Финляндия
-```
-</details>
-
-### Переопределение настроек конфигурации
-По умолчанию следующие параметры конфигурации, полученные от подписки, **не переопределяются** клиентом:
-
-- `allow-lan` - Разрешить подключения из локальной сети
-- `ipv6` - Включить поддержку IPv6
-- `find-process-mode` - Режим поиска процессов
-- `tun-stack` - Сетевой стек режима TUN
-- `mixed-port` - Смешанный порт для HTTP/SOCKS прокси
-
-**Переопределение на стороне клиента:** Пользователи могут включить "Переопределить настройки провайдера" или "Переопределить сетевые настройки" в настройках приложения, чтобы применять свою локальную конфигурацию вместо настроек из подписки. Это полезно, когда нужны кастомные сетевые настройки.
-
-## Использование
-
-### Linux
-
-⚠️ Перед использованием убедитесь, что установлены следующие зависимости:
-
-```bash
- sudo apt-get install libayatana-appindicator3-dev
- sudo apt-get install libkeybinder-3.0-dev
+git tag -a v0.4.3 -m "说明"
+git push origin v0.4.3
 ```
 
-### Android
+推送标签后自动构建全部平台并发布 Release；标签含 `-`（如 `v0.4.3-beta.1`）时发布会标记为 pre-release。
 
-Поддерживаются следующие действия:
+---
 
-```bash
- com.follow.clashx.action.START
+## 目录结构
 
- com.follow.clashx.action.STOP
-
- com.follow.clashx.action.CHANGE
+```
+lib/                     Flutter 界面与业务逻辑（页面、状态、Clash 控制层）
+core/                    Go 内核封装（mihomo），含 build_ohos.sh 与 vendored sing-tun
+  third_party/sing-tun/  鸿蒙 TUN 适配分支（channel 端点 + 原始 fd 读写）
+ohos/                    HarmonyOS NEXT 工程（ArkTS VpnExtensionAbility + NAPI 桥）
+android/ windows/ linux/ macos/    各平台工程
+arb/                     多语言资源（zh_CN / en / ja / ru）
+setup.dart               跨平台构建编排（内核交叉编译 + flutter build + 打包）
+services/helper/         桌面端特权辅助进程
+.github/workflows/       CI：ci / build / macos / release
 ```
 
-## Скачать
+---
 
-<a href="https://github.com/pluralplay/FlClashX/releases"><img alt="Get it on GitHub" src="snapshots/get-it-on-github.svg" width="200px"/></a>
-<a href="https://apps.obtainium.imranr.dev/redirect?r=obtainium://app/%7B%22id%22%3A%22com.follow.clashx%22%2C%22url%22%3A%22https%3A%2F%2Fgithub.com%2Fpluralplay%2FFlClashX%22%2C%22author%22%3A%22pluralplay%22%2C%22name%22%3A%22FlClashX%22%2C%22preferredApkIndex%22%3A0%2C%22additionalSettings%22%3A%22%7B%5C%22includePrereleases%5C%22%3Afalse%2C%5C%22fallbackToOlderReleases%5C%22%3Afalse%2C%5C%22filterReleaseTitlesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22filterReleaseNotesByRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22verifyLatestTag%5C%22%3Atrue%2C%5C%22sortMethodChoice%5C%22%3A%5C%22date%5C%22%2C%5C%22useLatestAssetDateAsReleaseDate%5C%22%3Afalse%2C%5C%22releaseTitleAsVersion%5C%22%3Afalse%2C%5C%22trackOnly%5C%22%3Afalse%2C%5C%22versionExtractionRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22matchGroupToUse%5C%22%3A%5C%22%5C%22%2C%5C%22versionDetection%5C%22%3Atrue%2C%5C%22releaseDateAsVersion%5C%22%3Afalse%2C%5C%22useVersionCodeAsOSVersion%5C%22%3Afalse%2C%5C%22apkFilterRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22invertAPKFilter%5C%22%3Afalse%2C%5C%22autoApkFilterByArch%5C%22%3Atrue%2C%5C%22appName%5C%22%3A%5C%22%5C%22%2C%5C%22appAuthor%5C%22%3A%5C%22%5C%22%2C%5C%22shizukuPretendToBeGooglePlay%5C%22%3Afalse%2C%5C%22allowInsecure%5C%22%3Afalse%2C%5C%22exemptFromBackgroundUpdates%5C%22%3Afalse%2C%5C%22skipUpdateNotifications%5C%22%3Afalse%2C%5C%22about%5C%22%3A%5C%22%5C%22%2C%5C%22refreshBeforeDownload%5C%22%3Afalse%2C%5C%22includeZips%5C%22%3Afalse%2C%5C%22zippedApkFilterRegEx%5C%22%3A%5C%22%5C%22%2C%5C%22includeTarballs%5C%22%3Afalse%2C%5C%22tarballedApkFilterRegEx%5C%22%3A%5C%22%5C%22%7D%22%2C%22overrideSource%22%3Anull%7D
-"><img alt="Get it on Obtanium" src="snapshots/get-it-on-obtanium.svg" width="200px"/></a>
+## 已知限制
 
-## Star
+- **鸿蒙端**：分应用归属解析（`ResolveProcess`）未实现；快捷磁贴、桌面小组件、TV 适配不在当前范围；通知为常驻基础样式；
+- **桌面端**：Linux 上 TUN 模式需要 root 或 `CAP_NET_ADMIN`；
+- **签名**：云端产物均未做商业签名，商店分发需自行配置证书；
+- **macOS**：应用未公证，首次启动需右键打开。
 
-<p style="text-align: center;">
-Самый простой способ поддержать разработчиков — нажать на звездочку (⭐) в верхней части страницы.<br>
-Если хотите поддержать копеечкой, то можно <a href="https://t.me/tribute/app?startapp=dtyh">сделать это тут.</a></p>
+---
 
-**TON USDT:** `UQDSfrJ_k1BdsknhdR_zj4T3Is3OdMylD8PnDJ9mxO35i-TE`
+## 致谢与许可
+
+- 内核：[MetaCubeX/mihomo](https://github.com/MetaCubeX/mihomo)（Clash.Meta）
+- TUN 栈：[MetaCubeX/sing-tun](https://github.com/MetaCubeX/sing-tun)
+- 上游客户端：[chen08209/FlClash](https://github.com/chen08209/FlClash)、[pluralplay/FlClashX](https://github.com/pluralplay/FlClashX)
+- 鸿蒙 Flutter 适配：[openharmony-sig/flutter_flutter](https://gitee.com/openharmony-sig/flutter_flutter)
+
+本项目遵循 [GPL-3.0](LICENSE) 许可证。请在遵守当地法律法规的前提下使用本软件。
