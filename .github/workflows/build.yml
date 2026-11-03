@@ -102,21 +102,6 @@ jobs:
           echo "ANDROID_NDK=$NDK_DIR" >> "$GITHUB_ENV"
           echo "Resolved ANDROID_NDK=$NDK_DIR"
 
-      # gradle pins ndkVersion 28.0.13004108; auto-installing it fails unless the
-      # matching SDK license is accepted, so accept everything and preinstall.
-      # sdkmanager is not on the runner's PATH — locate it under cmdline-tools.
-      - name: Accept SDK licenses & install pinned NDK
-        if: matrix.platform == 'android'
-        run: |
-          SDKM="${ANDROID_SDK_ROOT:-$ANDROID_HOME}/cmdline-tools/latest/bin/sdkmanager"
-          if [ ! -x "$SDKM" ]; then
-            SDKM=$(find "${ANDROID_SDK_ROOT:-$ANDROID_HOME}" -name sdkmanager -type f 2>/dev/null | head -n1)
-          fi
-          echo "Using sdkmanager: $SDKM"
-          test -n "$SDKM"
-          yes | "$SDKM" --licenses > /dev/null || true
-          "$SDKM" --install "ndk;28.0.13004108" > /dev/null
-
       - name: Get Flutter Dependency
         run: flutter pub get
 
