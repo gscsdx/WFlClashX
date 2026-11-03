@@ -146,11 +146,11 @@ MSYS_NO_PATHCONV=1 hdc shell "ps -ef | grep clashx"               # 主进程 + 
 
 ## 6. 验证记录
 
-### TCP 链路（2026-11-03 上午）
+### TCP 链路
 - baidu.com 完整渲染（DIRECT 规则）；google.com/search 完整渲染
 - REST /connections：24 条连接、7 条 TCP 全有真实数据；`www.google.com:443` down=40,135 B
 
-### 后台保活（2026-11-03 14:29–14:40，锁屏 10 分钟）
+### 后台保活，锁屏 10 分钟）
 
 | 时点 | 主进程 | 扩展进程 | vpn-tun RX |
 |---|---|---|---|
