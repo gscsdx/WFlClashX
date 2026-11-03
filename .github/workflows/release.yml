@@ -111,14 +111,16 @@ jobs:
           choco install innosetup -y
           echo "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
-      - name: Setup macOS ad-hoc signing (no Apple certificate in this repo)
+      - name: Disable macOS code signing (no Apple certificate in this repo)
         if: matrix.platform == 'macos'
         run: |
           cat > macos/Runner/Configs/Local.xcconfig << EOF
-          CODE_SIGN_IDENTITY = -
+          CODE_SIGN_IDENTITY =
+          CODE_SIGNING_ALLOWED = NO
           CODE_SIGNING_REQUIRED = NO
           EOF
-          echo "Wrote ad-hoc signing Local.xcconfig"
+          xattr -cr macos 2>/dev/null || true
+          echo "macOS code signing disabled (unsigned dmg)"
 
       - name: Build
         shell: bash
