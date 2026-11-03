@@ -63,6 +63,14 @@ jobs:
           dart setup.dart android 2>&1 | tee build.log
           exit ${PIPESTATUS[0]}
 
+      - name: Probe log tail
+        if: failure()
+        shell: bash
+        run: |
+          set +e +o pipefail
+          if [ ! -f build.log ]; then echo "::error::no build.log"; exit 0; fi
+          tail -n 10 build.log | while IFS= read -r line; do echo "::error::TAIL ${line:0:440}"; done
+
       - name: Probe gradle/xcode context
         if: failure()
         shell: bash
@@ -82,7 +90,7 @@ jobs:
         run: |
           set +e +o pipefail
           [ -f build.log ] || exit 0
-          grep -inE "CMake Error|error MSB|error LNK|error C[0-9]|error:|fatal error|cannot find|No such file" build.log 2>/dev/null \
+          grep -inE "CMake Error|error MSB|error LNK|error C[0-9]|error:|fatal error|cannot find|No such file|npm ERR|ERR!|EACCES|EPERM|Unable to" build.log 2>/dev/null \
             | grep -viE "ld: warning|warning:|Pods\.xcodeproj|Microsoft\.CppCommon|errorlevel|:VCEnd|asynchronous suspension|setup\.dart|Build\.exec|command_runner" \
             | tail -n 10 | while IFS= read -r line; do echo "::error::${line:0:440}"; done
 

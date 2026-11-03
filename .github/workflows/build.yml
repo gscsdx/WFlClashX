@@ -111,6 +111,13 @@ jobs:
           choco install innosetup -y
           echo "C:\Program Files (x86)\Inno Setup 6" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
 
+      - name: Configure npm prefix (macos)
+        if: matrix.platform == 'macos'
+        run: |
+          mkdir -p "$HOME/.npm-global"
+          npm config set prefix "$HOME/.npm-global"
+          echo "$HOME/.npm-global/bin" >> "$GITHUB_PATH"
+
       - name: Disable macOS code signing (no Apple certificate in this repo)
         if: matrix.platform == 'macos'
         run: |
@@ -127,6 +134,14 @@ jobs:
         run: |
           dart setup.dart ${{ matrix.platform }} ${{ matrix.arch && format('--arch {0}', matrix.arch) }} ${{ env.IS_STABLE == 'true' && '--env stable' || '' }} 2>&1 | tee build.log
           exit ${PIPESTATUS[0]}
+
+      - name: Probe log tail
+        if: failure()
+        shell: bash
+        run: |
+          set +e +o pipefail
+          if [ ! -f build.log ]; then echo "::error::no build.log"; exit 0; fi
+          tail -n 10 build.log | while IFS= read -r line; do echo "::error::TAIL ${line:0:440}"; done
 
       - name: Probe gradle/xcode context
         if: failure()
@@ -159,7 +174,7 @@ jobs:
         run: |
           set +e +o pipefail
           [ -f build.log ] || exit 0
-          grep -inE "CMake Error|error MSB|error LNK|error C[0-9]|error:|fatal error|cannot find|No such file" build.log 2>/dev/null \
+          grep -inE "CMake Error|error MSB|error LNK|error C[0-9]|error:|fatal error|cannot find|No such file|npm ERR|ERR!|EACCES|EPERM|Unable to" build.log 2>/dev/null \
             | grep -viE "ld: warning|warning:|Pods\.xcodeproj|Microsoft\.CppCommon|errorlevel|:VCEnd|asynchronous suspension|setup\.dart|Build\.exec|command_runner" \
             | tail -n 10 | while IFS= read -r line; do echo "::error::${line:0:440}"; done
 
