@@ -1,6 +1,6 @@
-# Wormhole 鸿蒙版（OHOS）交付说明
+# Wormhole 鸿蒙版（OHOS）
 
-> **品牌变更（2026-11-03）**：应用已由 FlClashX 更名为 **Wormhole**，包名 `com.follow.clashx` → `com.wormhole.app`，应用图标更换（MethodChannel 同步更名，Dart 包名 `flclashx`→`wormhole`）。Android/ 目录未随之重命名（后续迭代）。旧包名应用与新版并存，可卸载。
+> **包名 `com.follow.clashx` → `com.wormhole.app`。
 
 > 交付日期：2026-11-03 ｜ 版本：0.4.2 (versionCode 2026071801) ｜ 包名：com.wormhole.app ｜ 真机：华为 MatePad SGT-AL10 (HarmonyOS 5.x)
 >
@@ -52,7 +52,7 @@
 
 ---
 
-## 3. 变更清单（本次交付）
+## 3. 变更清单
 
 ### 3.1 TUN TCP 链路（gVisor 适配层）
 
@@ -147,7 +147,7 @@ MSYS_NO_PATHCONV=1 hdc shell "ps -ef | grep clashx"               # 主进程 + 
 ## 6. 验证记录
 
 ### TCP 链路（2026-11-03 上午）
-- baidu.com 完整渲染（DIRECT 规则）；google.com/search 完整渲染（🇸🇬新加坡专线02 > 自动选择 > 良心云）
+- baidu.com 完整渲染（DIRECT 规则）；google.com/search 完整渲染
 - REST /connections：24 条连接、7 条 TCP 全有真实数据；`www.google.com:443` down=40,135 B
 
 ### 后台保活（2026-11-03 14:29–14:40，锁屏 10 分钟）
