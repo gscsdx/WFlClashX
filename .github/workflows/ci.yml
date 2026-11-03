@@ -22,7 +22,7 @@ env:
 
 jobs:
   build-android:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -45,17 +45,14 @@ jobs:
           flutter-version: "3.41.7"
           cache: true
 
-      # The ubuntu-26 runner image no longer ships the Android NDK and
-      # setup.dart hard-requires ANDROID_NDK (assert). Install the exact NDK
-      # version pinned in android/app/build.gradle.kts.
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Android NDK
+      # Pin to ubuntu-24.04: the ubuntu-26 image dropped the Android SDK and
+      # android-actions/setup-android fails there. The 24.04 image ships the
+      # SDK + NDK preinstalled with licenses accepted.
+      - name: Resolve Android NDK
         run: |
-          sdkmanager --install "ndk;28.0.13004108" > /dev/null
-          echo "ANDROID_NDK=${ANDROID_SDK_ROOT:-$ANDROID_HOME}/ndk/28.0.13004108" >> "$GITHUB_ENV"
-          test -f "$ANDROID_NDK/source.properties" && echo "NDK installed at $ANDROID_NDK"
+          NDK_DIR=$(ls -d "${ANDROID_SDK_ROOT:-$ANDROID_HOME}/ndk"/* 2>/dev/null | sort -V | tail -n1)
+          echo "ANDROID_NDK=$NDK_DIR" >> "$GITHUB_ENV"
+          echo "Resolved ANDROID_NDK=$NDK_DIR"
 
       - name: Get Flutter dependencies
         run: flutter pub get
