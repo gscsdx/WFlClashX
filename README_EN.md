@@ -82,7 +82,7 @@ For production distribution you must supply your own certificates (Android keyst
 - Android 120 Hz support; Android TV remote-control improvements (paste button, group picker, QR profile transfer from phone);
 - Native macOS menu-bar mode;
 - Adjustable UI background transparency;
-- Localization: 简体中文 / English / 日本語 / Русский.
+- Localization: 简体中文 / English / Русский.
 
 ### HarmonyOS NEXT port
 
