@@ -1,6 +1,6 @@
 {
   "name": "libclash_bridge.so",
   "types": "./index.d.ts",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "NAPI bridge to the FlClashX Go clash core (mihomo) for OHOS"
 }

@@ -38,7 +38,7 @@
 
 ## Загрузка
 
-Установщики для нужной платформы — в разделе [**Releases**](https://github.com/gscsdx/WFlClashX/releases/latest). В релизе `v0.4.2` — 14 файлов:
+Установщики для нужной платформы — в разделе [**Releases**](https://github.com/gscsdx/WFlClashX/releases/latest). В релизе `v0.4.3` — 14 файлов:
 
 | Платформа | Файлы |
 | --- | --- |

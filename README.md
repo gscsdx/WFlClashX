@@ -38,7 +38,7 @@
 
 ## 下载
 
-前往 [**Releases**](https://github.com/gscsdx/WFlClashX/releases/latest) 下载对应平台的安装包。以 `v0.4.2` 为例共 14 个产物：
+前往 [**Releases**](https://github.com/gscsdx/WFlClashX/releases/latest) 下载对应平台的安装包。以 `v0.4.3` 为例共 14 个产物：
 
 | 平台 | 文件 |
 | --- | --- |

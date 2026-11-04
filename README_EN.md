@@ -38,7 +38,7 @@ Core versions: mihomo `v1.19.28`; the TUN stack is built on `metacubex/sing-tun 
 
 ## Download
 
-Grab the installer for your platform from [**Releases**](https://github.com/gscsdx/WFlClashX/releases/latest). Release `v0.4.2` ships 14 assets:
+Grab the installer for your platform from [**Releases**](https://github.com/gscsdx/WFlClashX/releases/latest). Release `v0.4.3` ships 14 assets:
 
 | Platform | Files |
 | --- | --- |

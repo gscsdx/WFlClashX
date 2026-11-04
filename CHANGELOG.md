@@ -1,3 +1,8 @@
+## v0.4.3
+
+- docs: README rewritten as three mirrored editions (中文 / English / Русский)
+- build: macOS dmg is produced with `hdiutil` (create-dmg needs a GUI session and fails on CI)
+
 ## v0.4.2
 
 - release 0.4.2
